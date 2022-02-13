@@ -7,7 +7,7 @@ int main()
 {
     string inString;
     int i;
-    freopen("spl_democode.txt","r",stdin);
+    //freopen("spl_democode.txt","r",stdin);
     getline(cin,inString);             //for input from file
     //cout<<inString;
     string temp = "";
