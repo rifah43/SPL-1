@@ -2,13 +2,85 @@
 using namespace std;
 vector<pair<string,string>> keep;
 
+string convertToString(char* a, int size);
+string commentDel(string code);
+bool isPunc(char ch);
+bool validId(char* str);
+bool isOperator(char ch);
+bool isOperatorduplicate(char ch);
+bool isKeyword(char *str);
+bool isNumber(char* str);
+char* subString(char* realStr, int l, int r);
+void parse(char* str);
+
+string convertToString(char* a, int size)
+{
+    int i;
+    string s = "";
+    for (i = 0; i < size; i++) {
+        s = s + a[i];
+    }
+    return s;
+}
+
+string commentDel(string code)
+{
+    int n = code.length();
+    string temp;
+ 
+    bool single = false;
+    bool multiple = false;
+ 
+    for (int i=0; i<n; i++)
+    {
+        if (single == true && code[i] == '\n')
+        {
+            single = false;
+        }
+        // else if (multiple == false && code[i-1] == '"' && code[i] == '"' && code[i+1] == '"')
+        // {
+        //     multiple = true,  i=i+2;
+        // }
+        // else if (multiple == true && code[i-1] == '"' && code[i] == '"' && code[i+1] == '"')
+        // {
+        //         multiple = false;
+        // }
+ 
+        else if (single)// || multiple)
+        {
+            continue;
+        }
+ 
+        else if (code[i] == '#')
+        {
+            single = true, i++;
+        }
+        else 
+        {
+            temp += code[i];
+        }
+    }
+    return temp;
+}
+
+// bool onlyQuote(string line)
+// {
+//     string s="print";
+//     for(int i=0; i<5; i++)
+//         if(s[i]!=line[i])
+//             return 0;
+//     return 1;
+// }
+
 bool isPunc(char ch)
 {		
-   if (ch == ' ' || ch == '+' || ch == '-' || ch == '*' ||
-        ch == '/' || ch == ',' || ch == ';' || ch == '>' ||
-        ch == '<' || ch == '=' || ch == '(' || ch == ')' ||
-        ch == '[' || ch == ']' || ch == '{' || ch == '}' ||
-        ch == '&' || ch == '|')
+   if ( ch == ' ' || ch == '+' || ch == '-' ||
+        ch == '*' || ch == '/' || ch == ',' ||
+        ch == ';' || ch == '>' || ch == '<' ||
+        ch == '=' || ch == '(' || ch == ')' ||
+        ch == '[' || ch == ']' || ch == '{' ||
+        ch == '}' || ch == '&' || ch == '|' ||
+        ch=='\n')//"\n" is counted as one character
         {
             return true;
         }
@@ -53,23 +125,26 @@ bool isOperator(char ch)
     return false;
 }
 
+bool isOperatorduplicate(char ch)
+{
+    if (ch == '+' || ch == '-' || ch == '*' ||
+        ch == '/' || ch == '>' || ch == '<' ||
+        ch == '=' || ch == '|' || ch == '&')
+    {
+       return true;
+    }
+    return false;
+}
+
 bool isKeyword(char *str)
 {
     if (!strcmp(str, "if") || !strcmp(str, "else") ||
         !strcmp(str, "while") || !strcmp(str, "do") ||
         !strcmp(str, "break") ||  !strcmp(str, "continue")
-        || !strcmp(str, "int") || !strcmp(str, "double")
-        || !strcmp(str, "float") || !strcmp(str, "return")
-        || !strcmp(str, "char") || !strcmp(str, "case")
-        || !strcmp(str, "long") || !strcmp(str, "short")
-        || !strcmp(str, "typedef") || !strcmp(str, "switch")
-        || !strcmp(str, "unsigned") || !strcmp(str, "void")
-        || !strcmp(str, "static") || !strcmp(str, "struct")
-        || !strcmp(str, "sizeof") || !strcmp(str,"long")
-        || !strcmp(str, "volatile") || !strcmp(str, "typedef")
-        || !strcmp(str, "enum") || !strcmp(str, "const")
-        || !strcmp(str, "union") || !strcmp(str, "print")
-        || !strcmp(str,"bool"))
+        || !strcmp(str, "return") || !strcmp(str,"input")
+        || !strcmp(str, "switch")|| !strcmp(str, "True")
+        || !strcmp(str, "print") || !strcmp(str, "False")
+        )
         {
             return true;
         }
@@ -125,6 +200,12 @@ void parse(char* str)
     int left = 0, right = 0;
     int len = strlen(str);
     while (right <= len && left <= right) {
+        if(str[right]=='\\' && str[right+1]=='n')
+        {
+            continue;
+        }
+        else
+        {
         if (isPunc(str[right]) == false)
             {
                 right++;
@@ -169,14 +250,20 @@ void parse(char* str)
             left = right;
             }
     }
+    }
     return;
 }
 
 int main()
 {
-    char c[100];
+    char d[5000];
+    int j=0;
     freopen("spl_democode.txt","r",stdin);
-    scanf("%[^\n]s",c);
+    scanf("%[^\0]s",&d);
+    string sd = convertToString(d, strlen(d));
+    string s =commentDel(d);
+    char c[s.size()+1];
+    strcpy(c, s.c_str());
     parse(c);
     for(int i=0;i<keep.size();i++)
     {
