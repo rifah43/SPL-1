@@ -13,14 +13,14 @@ bool isNumber(char* str);
 char* subString(char* realStr, int l, int r);
 void parse(char* str);
 
-string convertToString(char* a, int size)
+string convertToString(char* charArray, int size)
 {
     int i;
-    string s = "";
+    string convStr = "";
     for (i = 0; i < size; i++) {
-        s = s + a[i];
+        convStr = convStr + charArray[i];
     }
-    return s;
+    return convStr;
 }
 
 string commentDel(string code)
@@ -29,7 +29,6 @@ string commentDel(string code)
     string temp;
  
     bool single = false;
-    bool multiple = false;
  
     for (int i=0; i<n; i++)
     {
@@ -37,16 +36,8 @@ string commentDel(string code)
         {
             single = false;
         }
-        // else if (multiple == false && code[i-1] == '"' && code[i] == '"' && code[i+1] == '"')
-        // {
-        //     multiple = true,  i=i+2;
-        // }
-        // else if (multiple == true && code[i-1] == '"' && code[i] == '"' && code[i+1] == '"')
-        // {
-        //         multiple = false;
-        // }
  
-        else if (single)// || multiple)
+        else if (single)
         {
             continue;
         }
@@ -55,6 +46,38 @@ string commentDel(string code)
         {
             single = true, i++;
         }
+        else 
+        {
+            temp += code[i];
+        }
+    }
+    return temp;
+}
+
+string commentDelmulti(string code)
+{
+    int n = code.length();
+    string temp;
+
+    bool multiple = false;
+ 
+    for (int i=0; i<n-2; i++)
+    {
+        if (multiple == false && code[i] == '"' && code[i+1] == '"' && code[i+2] == '"')
+        {
+            multiple = true,  i=i+3;
+        }
+
+        else if (multiple == true && code[i] == '"' && code[i+1] == '"' && code[i+2] == '"')
+        {
+            multiple = false;
+        }
+ 
+        else if (multiple)
+        {
+            continue;
+        }
+ 
         else 
         {
             temp += code[i];
@@ -256,14 +279,15 @@ void parse(char* str)
 
 int main()
 {
-    char d[5000];
+    char input[5000];
     int j=0;
     freopen("spl_democode.txt","r",stdin);
-    scanf("%[^\0]s",&d);
-    string sd = convertToString(d, strlen(d));
-    string s =commentDel(d);
-    char c[s.size()+1];
-    strcpy(c, s.c_str());
+    scanf("%[^\0]s",&input);
+    string instring = convertToString(input, strlen(input));
+    string temp =commentDel(instring);
+    string string_wthoutCom =commentDelmulti(temp);
+    char c[string_wthoutCom.size()+1];
+    strcpy(c, string_wthoutCom.c_str());
     parse(c);
     for(int i=0;i<keep.size();i++)
     {
