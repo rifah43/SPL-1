@@ -1,7 +1,21 @@
 #include <bits/stdc++.h>
 using namespace std;
 vector<pair<string,string>> keep;
-
+vector<string> keywords;
+void keywordList()
+{
+    keywords.push_back("if");
+    keywords.push_back("else");
+    keywords.push_back("while");
+    keywords.push_back("do");
+    keywords.push_back("break");
+    keywords.push_back("continue");
+    keywords.push_back("return");
+    keywords.push_back("input");
+    keywords.push_back("print");
+    keywords.push_back("True");
+    keywords.push_back("False");
+}
 string convertToString(char* a, int size);
 string commentDel(string code);
 bool isPunc(char ch);
@@ -86,39 +100,106 @@ string commentDelmulti(string code)
     return temp;
 }
 
-// bool onlyQuote(string line)
-// {
-//     string s="print";
-//     for(int i=0; i<5; i++)
-//         if(s[i]!=line[i])
-//             return 0;
-//     return 1;
-// }
-
 bool isPunc(char ch)
 {		
-   if ( ch == ' ' || ch == '+' || ch == '-' ||
-        ch == '*' || ch == '/' || ch == ',' ||
-        ch == ';' || ch == '>' || ch == '<' ||
-        ch == '=' || ch == '(' || ch == ')' ||
-        ch == '[' || ch == ']' || ch == '{' ||
-        ch == '}' || ch == '&' || ch == '|' ||
-        ch=='\n')//"\n" is counted as one character
-        {
-            return true;
-        }
-    return false;
+    switch (ch)
+    {
+        case '+':
+        return true;
+
+        case '-':
+        return true;
+
+        case '*':
+        return true;
+        
+        case '/':
+        return true;
+
+        case ',':
+        return true;
+        
+        case ';':
+        return true;
+
+        case '>':
+        return true;
+        
+        case '<':
+        return true;
+
+        case '=':
+        return true;
+        
+        case '(':
+        return true;
+
+        case ')':
+        return true;
+        
+        case '|':
+        return true;
+
+        case '&':
+        return true;
+        
+        case '[':
+        return true;
+
+        case ']':
+        return true;
+
+        case '"':
+        return true;
+        
+        case '\n':
+        return true;
+    
+        default:
+        return false;
+    }
 }
 
 bool validId(char* str)
 {
-    if (str[0] == '0' || str[0] == '1' || str[0] == '2' ||
-        str[0] == '3' || str[0] == '4' || str[0] == '5' ||
-        str[0] == '6' || str[0] == '7' || str[0] == '8' ||
-        str[0] == '9' || isPunc(str[0]) == true)
-        {
-            return false;
-        }									
+    char temp=str[0];
+    switch (temp)
+    {
+        case '0':
+        return false;
+
+        case '1':
+        return false;
+
+        case '2':
+        return false;
+        
+        case '3':
+        return false;
+
+        case '4':
+        return false;
+        
+        case '5':
+        return false;
+
+        case '6':
+        return false;
+        
+        case '7':
+        return false;
+
+        case '8':
+        return false;
+        
+        case '9':
+        return false;
+        
+    }
+    if(ispunct(temp))
+    {
+        return false;
+    }									
     int i,len = strlen(str);
     if (len == 1)
     {
@@ -139,41 +220,84 @@ bool validId(char* str)
 
 bool isOperator(char ch)
 {
-    if (ch == '+' || ch == '-' || ch == '*' ||
-        ch == '/' || ch == '>' || ch == '<' ||
-        ch == '=' || ch == '|' || ch == '&')
+    switch (ch)
     {
-       return true;
+        case '+':
+        return true;
+
+        case '-':
+        return true;
+
+        case '*':
+        return true;
+        
+        case '/':
+        return true;
+
+        case '>':
+        return true;
+        
+        case '<':
+        return true;
+
+        case '|':
+        return true;
+
+        case '&':
+        return true;
+
+        case '=':
+        return true;
+
+        default:
+        return false;
     }
-    return false;
 }
 
 bool isOperatorduplicate(char ch)
 {
-    if (ch == '+' || ch == '-' || ch == '*' ||
-        ch == '/' || ch == '>' || ch == '<' ||
-        ch == '=' || ch == '|' || ch == '&')
+    switch (ch)
     {
-       return true;
+        case '+':
+        return true;
+
+        case '-':
+        return true;
+
+        case '|':
+        return true;
+
+        case '&':
+        return true;
+
+        case '=':
+        return true;
+
+        default:
+        return false;
     }
-    return false;
 }
 
 bool isKeyword(char *str)
 {
-    if (!strcmp(str, "if") || !strcmp(str, "else") ||
-        !strcmp(str, "while") || !strcmp(str, "do") ||
-        !strcmp(str, "break") ||  !strcmp(str, "continue")
-        || !strcmp(str, "return") || !strcmp(str,"input")
-        || !strcmp(str, "switch")|| !strcmp(str, "True")
-        || !strcmp(str, "print") || !strcmp(str, "False")
-        )
+    char carray[10];
+    strcpy(carray,str);
+    string temp= convertToString(carray,strlen(carray));
+    int counter=0;
+    for(int i=0;i<keywords.size();i++)
+    {
+        if(temp==keywords[i])
         {
-            return true;
+            counter++;
         }
+    }
+    if(counter>0)
+    {
+        return true;
+    }
     else
     {
-       return false;
+        return false;
     }
 }
 
@@ -186,6 +310,7 @@ bool isNumber(char* str)
     }
     for (i = 0 ; i < len ; i++)
     {
+        char temp= str[i];
         if (numOfDecimal > 1 && str[i] == '.')
         {
             return false;
@@ -193,6 +318,7 @@ bool isNumber(char* str)
         {
             numOfDecimal++;
         }
+     
         if (str[i] != '0' && str[i] != '1' && str[i] != '2'
             && str[i] != '3' && str[i] != '4' && str[i] != '5'
             && str[i] != '6' && str[i] != '7' && str[i] != '8'
