@@ -19,9 +19,9 @@ void keywordList()
 string convertToString(char* a, int size);
 string commentDel(string code);
 bool isPunc(char ch);
+bool isDigit(char ch);
 bool validId(char* str);
 bool isOperator(char ch);
-bool isOperatorduplicate(char ch);
 bool isKeyword(char *str);
 bool isNumber(char* str);
 char* subString(char* realStr, int l, int r);
@@ -154,7 +154,49 @@ bool isPunc(char ch)
         
         case '\n':
         return true;
+
+        case '\t':
+        return true;
     
+        default:
+        return false;
+    }
+}
+
+bool isDigit(char ch)
+{
+    switch (ch)
+    {
+        case '0':
+        return true;
+
+        case '1':
+        return true;
+
+        case '2':
+        return true;
+        
+        case '3':
+        return true;
+
+        case '4':
+        return true;
+        
+        case '5':
+        return true;
+
+        case '6':
+        return true;
+        
+        case '7':
+        return true;
+
+        case '8':
+        return true;
+        
+        case '9':
+        return true;
+        
         default:
         return false;
     }
@@ -163,40 +205,8 @@ bool isPunc(char ch)
 bool validId(char* str)
 {
     char temp=str[0];
-    switch (temp)
-    {
-        case '0':
-        return false;
-
-        case '1':
-        return false;
-
-        case '2':
-        return false;
-        
-        case '3':
-        return false;
-
-        case '4':
-        return false;
-        
-        case '5':
-        return false;
-
-        case '6':
-        return false;
-        
-        case '7':
-        return false;
-
-        case '8':
-        return false;
-        
-        case '9':
-        return false;
-        
-    }
-    if(ispunct(temp))
+    
+    if(ispunct(temp)==true || isDigit(temp)== true)
     {
         return false;
     }									
@@ -234,37 +244,13 @@ bool isOperator(char ch)
         case '/':
         return true;
 
-        case '>':
+        case '|':
         return true;
-        
+
         case '<':
         return true;
 
-        case '|':
-        return true;
-
-        case '&':
-        return true;
-
-        case '=':
-        return true;
-
-        default:
-        return false;
-    }
-}
-
-bool isOperatorduplicate(char ch)
-{
-    switch (ch)
-    {
-        case '+':
-        return true;
-
-        case '-':
-        return true;
-
-        case '|':
+        case '>':
         return true;
 
         case '&':
@@ -319,10 +305,7 @@ bool isNumber(char* str)
             numOfDecimal++;
         }
      
-        if (str[i] != '0' && str[i] != '1' && str[i] != '2'
-            && str[i] != '3' && str[i] != '4' && str[i] != '5'
-            && str[i] != '6' && str[i] != '7' && str[i] != '8'
-            && str[i] != '9' || (str[i] == '-' && i > 0))
+        if (isDigit(str[i])==false || (str[i] == '-' && i > 0))
             {
                 return false;
             }
@@ -348,13 +331,8 @@ void parse(char* str)
 {
     int left = 0, right = 0;
     int len = strlen(str);
-    while (right <= len && left <= right) {
-        if(str[right]=='\\' && str[right+1]=='n')
-        {
-            continue;
-        }
-        else
-        {
+    while (right <= len && left <= right)
+    {
         if (isPunc(str[right]) == false)
             {
                 right++;
@@ -362,43 +340,92 @@ void parse(char* str)
 
         if (isPunc(str[right]) == true && left == right)
             {
-            if (isOperator(str[right]) == true)
-            {
-                  char az=str[right];
-                  string a;
-                  a.push_back(az);
-                keep.push_back(make_pair("OPERATOR",a));
+                int cnt=0;
+                if (isOperator(str[right]) == true && isOperator(str[right+1]) == true)
+                {
+                    cnt=2;
+                    if((str[right]=='>' || str[right]=='<') && str[right+1]=='=' )
+                    {
+                        string a;
+                        a.push_back(str[right]);
+                        a.push_back(str[right+1]);
+                        keep.push_back(make_pair("RELATIONAL OPERATOR",a));
+                    }
+                    else if(str[right]=='+' && (str[right]=='+' || str[right+1]=='='))
+                    {
+                        string a;
+                        a.push_back(str[right]);
+                        a.push_back(str[right+1]);
+                        keep.push_back(make_pair("INCREMENT OPERATOR",a));
+                    }
+                    else if(str[right]=='-' && (str[right]=='-' || str[right+1]=='='))
+                    {
+                        string a;
+                        a.push_back(str[right]);
+                        a.push_back(str[right+1]);
+                        keep.push_back(make_pair("DECREMENT OPERATOR",a));
+                    }
+                }
+                if (isOperator(str[right]) == true && isOperator(str[right+1]) == false)
+                {
+                    cnt=1;
+                    if(str[right]=='>' || str[right]=='<')
+                    {
+                        string a;
+                        a.push_back(str[right]);
+                        keep.push_back(make_pair("RELATIONAL OPERATOR",a));
+                    }
+                    if(str[right]=='=')
+                    {
+                        string a;
+                        a.push_back(str[right]);
+                        keep.push_back(make_pair("ASSIGNMENT OPERATOR",a));
+                    }
+                    else
+                    {
+                        char az=str[right];
+                        string a;
+                        a.push_back(az);
+                        keep.push_back(make_pair("OPERATOR",a));
+                    }
+                }
+                if(cnt==2)
+                {
+                    right=right+2;
+                }
+                else
+                {
+                    right++;
+                }
+                left = right;
             }
-            right++;
-            left = right;
-            } else if (isPunc(str[right]) == true && left != right
-                   || (right == len && left != right))
+            else if (isPunc(str[right]) == true && left != right
+            || (right == len && left != right))
             {
             char* sub = subString(str, left, right - 1);
             string str(sub);
 
             if (isKeyword(sub) == true)
-                        {
-                              keep.push_back(make_pair("KEYWORD",str));
-                        }
+            {
+                keep.push_back(make_pair("KEYWORD",str));
+            }
             else if (isNumber(sub) == true)
-                        {
-                            keep.push_back(make_pair("NUMBER",str));
-                        }
+            {
+                keep.push_back(make_pair("NUMBER",str));
+            }
             else if (validId(sub) == true
-                     && isPunc(str[right - 1]) == false)
-                     {
-                         keep.push_back(make_pair("Valid Identifier",str));
-                     }
+            && isPunc(str[right - 1]) == false)
+            {
+                keep.push_back(make_pair("Valid Identifier",str));
+            }
             else if (validId(sub) == false
-                     && isPunc(str[right - 1]) == false)
-                     {
-                         keep.push_back(make_pair("Non-Valid Identifier",str));
-                     }
+            && isPunc(str[right - 1]) == false)
+            {
+                keep.push_back(make_pair("Non-Valid Identifier",str));
+            }
 
             left = right;
             }
-    }
     }
     return;
 }
