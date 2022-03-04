@@ -1,7 +1,26 @@
 #include <bits/stdc++.h>
 using namespace std;
 vector<pair<string,string>> keep;
-vector<string> keywords;
+vector<string>keywords;
+vector<char>digit;
+vector<char>punc;
+vector<char>oprtr;
+
+void keywordList();
+void numList();
+void puncList();
+void opList();
+string convertToString(char* a, int size);
+string commentDel(string code);
+bool isPunc(char ch);
+bool isDigit(char ch);
+bool validId(char* str);
+bool isOperator(char ch);
+bool isKeyword(char *str);
+bool isNumber(char* str);
+char* subString(char* realStr, int l, int r);
+void parse(char* str);
+
 void keywordList()
 {
     keywords.push_back("if");
@@ -16,17 +35,56 @@ void keywordList()
     keywords.push_back("True");
     keywords.push_back("False");
 }
-string convertToString(char* a, int size);
-string commentDel(string code);
-bool isPunc(char ch);
-bool isDigit(char ch);
-bool validId(char* str);
-bool isOperator(char ch);
-bool isKeyword(char *str);
-bool isNumber(char* str);
-char* subString(char* realStr, int l, int r);
-void parse(char* str);
 
+void numList()
+{
+    digit.push_back('1');
+    digit.push_back('2');
+    digit.push_back('3');
+    digit.push_back('4');
+    digit.push_back('5');
+    digit.push_back('6');
+    digit.push_back('7');
+    digit.push_back('8');
+    digit.push_back('9');
+    digit.push_back('0');
+}
+
+void puncList()
+{
+    punc.push_back('+');
+    punc.push_back('-');
+    punc.push_back('*');
+    punc.push_back('/');
+    punc.push_back(',');
+    punc.push_back(':');
+    punc.push_back(';');
+    punc.push_back('>');
+    punc.push_back('<');
+    punc.push_back('=');
+    punc.push_back(')');
+    punc.push_back('(');
+    punc.push_back('|');
+    punc.push_back('&');
+    punc.push_back('[');
+    punc.push_back(']');
+    punc.push_back('"');
+    punc.push_back('\n');
+    punc.push_back('\t');
+}
+
+void opList()
+{
+    oprtr.push_back('+');
+    oprtr.push_back('-');
+    oprtr.push_back('*');
+    oprtr.push_back('/');
+    oprtr.push_back('>');
+    oprtr.push_back('<');
+    oprtr.push_back('=');
+    oprtr.push_back('|');
+    oprtr.push_back('&');
+}
 string convertToString(char* charArray, int size)
 {
     int i;
@@ -102,102 +160,40 @@ string commentDelmulti(string code)
 
 bool isPunc(char ch)
 {		
-    switch (ch)
+    int counter=0;
+    for(int i=0;i<punc.size();i++)
     {
-        case '+':
+        if(ch==punc.at(i))
+        {
+            counter++;
+        }
+    }
+    if(counter!=0)
+    {
         return true;
-
-        case '-':
-        return true;
-
-        case '*':
-        return true;
-        
-        case '/':
-        return true;
-
-        case ',':
-        return true;
-        
-        case ';':
-        return true;
-
-        case '>':
-        return true;
-        
-        case '<':
-        return true;
-
-        case '=':
-        return true;
-        
-        case '(':
-        return true;
-
-        case ')':
-        return true;
-        
-        case '|':
-        return true;
-
-        case '&':
-        return true;
-        
-        case '[':
-        return true;
-
-        case ']':
-        return true;
-
-        case '"':
-        return true;
-        
-        case '\n':
-        return true;
-
-        case '\t':
-        return true;
-    
-        default:
+    }
+    else
+    {
         return false;
     }
 }
 
 bool isDigit(char ch)
 {
-    switch (ch)
+    int counter=0;
+    for(int i=0;i<digit.size();i++)
     {
-        case '0':
+        if(ch==digit.at(i))
+        {
+            counter++;
+        }
+    }
+    if(counter!=0)
+    {
         return true;
-
-        case '1':
-        return true;
-
-        case '2':
-        return true;
-        
-        case '3':
-        return true;
-
-        case '4':
-        return true;
-        
-        case '5':
-        return true;
-
-        case '6':
-        return true;
-        
-        case '7':
-        return true;
-
-        case '8':
-        return true;
-        
-        case '9':
-        return true;
-        
-        default:
+    }
+    else
+    {
         return false;
     }
 }
@@ -230,36 +226,20 @@ bool validId(char* str)
 
 bool isOperator(char ch)
 {
-    switch (ch)
+    int counter=0;
+    for(int i=0;i<oprtr.size();i++)
     {
-        case '+':
+        if(ch==oprtr.at(i))
+        {
+            counter++;
+        }
+    }
+    if(counter!=0)
+    {
         return true;
-
-        case '-':
-        return true;
-
-        case '*':
-        return true;
-        
-        case '/':
-        return true;
-
-        case '|':
-        return true;
-
-        case '<':
-        return true;
-
-        case '>':
-        return true;
-
-        case '&':
-        return true;
-
-        case '=':
-        return true;
-
-        default:
+    }
+    else
+    {
         return false;
     }
 }
@@ -277,7 +257,7 @@ bool isKeyword(char *str)
             counter++;
         }
     }
-    if(counter>0)
+    if(counter!=0)
     {
         return true;
     }
@@ -403,25 +383,25 @@ void parse(char* str)
             || (right == len && left != right))
             {
             char* sub = subString(str, left, right - 1);
-            string str(sub);
+            string st(sub);
 
             if (isKeyword(sub) == true)
             {
-                keep.push_back(make_pair("KEYWORD",str));
+                keep.push_back(make_pair("KEYWORD",st));
             }
             else if (isNumber(sub) == true)
             {
-                keep.push_back(make_pair("NUMBER",str));
+                keep.push_back(make_pair("NUMBER",st));
             }
             else if (validId(sub) == true
             && isPunc(str[right - 1]) == false)
             {
-                keep.push_back(make_pair("Valid Identifier",str));
+                keep.push_back(make_pair("Valid Identifier",st));
             }
             else if (validId(sub) == false
             && isPunc(str[right - 1]) == false)
             {
-                keep.push_back(make_pair("Non-Valid Identifier",str));
+                keep.push_back(make_pair("Non-Valid Identifier",st));
             }
 
             left = right;
@@ -433,6 +413,10 @@ void parse(char* str)
 int main()
 {
     char input[5000];
+    keywordList();
+    numList();
+    puncList();
+    opList();
     int j=0;
     freopen("spl_democode.txt","r",stdin);
     scanf("%[^\0]s",&input);
