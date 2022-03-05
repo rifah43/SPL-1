@@ -382,26 +382,48 @@ void parse(char* str)
             else if (isPunc(str[right]) == true && left != right
             || (right == len && left != right))
             {
-            char* sub = subString(str, left, right - 1);
-            string st(sub);
-
-            if (isKeyword(sub) == true)
+                if(str[left-1]=='"')
+                {
+                    string temp;
+                    while(str[left]!='"' && str[left]>=32 && str[left]<=127)
+                    {
+                        if(str[left]=='"')
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            string tchar;
+                            tchar=str[left];
+                            temp.append(tchar);
+                            left++;
+                        }
+                    }
+                    keep.push_back(make_pair("STRING",temp));
+                }
+            
+            else
             {
-                keep.push_back(make_pair("KEYWORD",st));
-            }
-            else if (isNumber(sub) == true)
-            {
-                keep.push_back(make_pair("NUMBER",st));
-            }
-            else if (validId(sub) == true
-            && isPunc(str[right - 1]) == false)
-            {
-                keep.push_back(make_pair("Valid Identifier",st));
-            }
-            else if (validId(sub) == false
-            && isPunc(str[right - 1]) == false)
-            {
-                keep.push_back(make_pair("Non-Valid Identifier",st));
+                char* sub = subString(str, left, right - 1);
+                string st= convertToString(sub,strlen(sub));
+                    if (isKeyword(sub) == true)
+                {
+                    keep.push_back(make_pair("KEYWORD",st));
+                }
+                else if (isNumber(sub) == true)
+                {
+                    keep.push_back(make_pair("NUMBER",st));
+                }
+                else if (validId(sub) == true
+                && isPunc(str[right - 1]) == false)
+                {
+                    keep.push_back(make_pair("Valid Identifier",st));
+                }
+                else if (validId(sub) == false
+                && isPunc(str[right - 1]) == false)
+                {
+                    keep.push_back(make_pair("Non-Valid Identifier",st));
+                }
             }
 
             left = right;
@@ -412,15 +434,18 @@ void parse(char* str)
 
 int main()
 {
+    cout<<"Enter the name of the file: "<<endl;
+    string fileName;
+    cin>>fileName;
     char input[5000];
     keywordList();
     numList();
     puncList();
     opList();
     int j=0;
-    freopen("spl_democode.txt","r",stdin);
+    freopen(fileName.c_str(),"r",stdin);
     scanf("%[^\0]s",&input);
-    string instring = convertToString(input, strlen(input));
+    string instring= convertToString(input,strlen(input));
     string temp =commentDel(instring);
     string string_wthoutCom =commentDelmulti(temp);
     char c[string_wthoutCom.size()+1];
