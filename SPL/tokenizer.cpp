@@ -1,7 +1,23 @@
-#include <bits/stdc++.h>
-using namespace std;
-vector<pair<string,string>> keep;
-vector<string> keywords;
+#include"main.h"
+
+vector<string>keywords;
+vector<char>digit;
+vector<char>punc;
+vector<char>oprtr;
+vector<string>boolOprtr;
+vector<string>spcOprtr1;
+vector<string>spcOprtr2;
+
+string convertToString(char* charArray, int size)
+{
+    int i;
+    string convStr = "";
+    for (i = 0; i < size; i++) {
+        convStr = convStr + charArray[i];
+    }
+    return convStr;
+}
+
 void keywordList()
 {
     keywords.push_back("if");
@@ -16,25 +32,78 @@ void keywordList()
     keywords.push_back("True");
     keywords.push_back("False");
 }
-string convertToString(char* a, int size);
-string commentDel(string code);
-bool isPunc(char ch);
-bool validId(char* str);
-bool isOperator(char ch);
-bool isOperatorduplicate(char ch);
-bool isKeyword(char *str);
-bool isNumber(char* str);
-char* subString(char* realStr, int l, int r);
-void parse(char* str);
 
-string convertToString(char* charArray, int size)
+void numList()
 {
-    int i;
-    string convStr = "";
-    for (i = 0; i < size; i++) {
-        convStr = convStr + charArray[i];
-    }
-    return convStr;
+    digit.push_back('1');
+    digit.push_back('2');
+    digit.push_back('3');
+    digit.push_back('4');
+    digit.push_back('5');
+    digit.push_back('6');
+    digit.push_back('7');
+    digit.push_back('8');
+    digit.push_back('9');
+    digit.push_back('0');
+}
+
+void puncList()
+{
+    punc.push_back('+');
+    punc.push_back('-');
+    punc.push_back('*');
+    punc.push_back('/');
+    punc.push_back(',');
+    punc.push_back(':');
+    punc.push_back(';');
+    punc.push_back('>');
+    punc.push_back('<');
+    punc.push_back('=');
+    punc.push_back(')');
+    punc.push_back('(');
+    punc.push_back('|');
+    punc.push_back('&');
+    punc.push_back('[');
+    punc.push_back(']');
+    punc.push_back('"');
+    punc.push_back('\n');
+    punc.push_back('\t');
+}
+
+void opList()
+{
+    oprtr.push_back('+');
+    oprtr.push_back('-');
+    oprtr.push_back('*');
+    oprtr.push_back('/');
+    oprtr.push_back('>');
+    oprtr.push_back('<');
+    oprtr.push_back('=');
+    oprtr.push_back('|');
+    oprtr.push_back('&');
+    oprtr.push_back('!');
+    oprtr.push_back('%');
+    oprtr.push_back('^');
+    oprtr.push_back('~');
+}
+
+void boolOpList()
+{
+    boolOprtr.push_back("and");
+    boolOprtr.push_back("or");
+    boolOprtr.push_back("not");
+}
+
+void spcOpList1()
+{
+    spcOprtr1.push_back("is");
+    spcOprtr1.push_back("is not");
+}
+
+void spcOpList2()
+{
+    spcOprtr2.push_back("in");
+    spcOprtr2.push_back("not in");
 }
 
 string commentDel(string code)
@@ -102,60 +171,40 @@ string commentDelmulti(string code)
 
 bool isPunc(char ch)
 {		
-    switch (ch)
+    int counter=0;
+    for(int i=0;i<punc.size();i++)
     {
-        case '+':
+        if(ch==punc.at(i))
+        {
+            counter++;
+        }
+    }
+    if(counter!=0)
+    {
         return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 
-        case '-':
+bool isDigit(char ch)
+{
+    int counter=0;
+    for(int i=0;i<digit.size();i++)
+    {
+        if(ch==digit.at(i))
+        {
+            counter++;
+        }
+    }
+    if(counter!=0)
+    {
         return true;
-
-        case '*':
-        return true;
-        
-        case '/':
-        return true;
-
-        case ',':
-        return true;
-        
-        case ';':
-        return true;
-
-        case '>':
-        return true;
-        
-        case '<':
-        return true;
-
-        case '=':
-        return true;
-        
-        case '(':
-        return true;
-
-        case ')':
-        return true;
-        
-        case '|':
-        return true;
-
-        case '&':
-        return true;
-        
-        case '[':
-        return true;
-
-        case ']':
-        return true;
-
-        case '"':
-        return true;
-        
-        case '\n':
-        return true;
-    
-        default:
+    }
+    else
+    {
         return false;
     }
 }
@@ -163,40 +212,8 @@ bool isPunc(char ch)
 bool validId(char* str)
 {
     char temp=str[0];
-    switch (temp)
-    {
-        case '0':
-        return false;
-
-        case '1':
-        return false;
-
-        case '2':
-        return false;
-        
-        case '3':
-        return false;
-
-        case '4':
-        return false;
-        
-        case '5':
-        return false;
-
-        case '6':
-        return false;
-        
-        case '7':
-        return false;
-
-        case '8':
-        return false;
-        
-        case '9':
-        return false;
-        
-    }
-    if(ispunct(temp))
+    
+    if(ispunct(temp)==true || isDigit(temp)== true)
     {
         return false;
     }									
@@ -220,60 +237,20 @@ bool validId(char* str)
 
 bool isOperator(char ch)
 {
-    switch (ch)
+    int counter=0;
+    for(int i=0;i<oprtr.size();i++)
     {
-        case '+':
-        return true;
-
-        case '-':
-        return true;
-
-        case '*':
-        return true;
-        
-        case '/':
-        return true;
-
-        case '>':
-        return true;
-        
-        case '<':
-        return true;
-
-        case '|':
-        return true;
-
-        case '&':
-        return true;
-
-        case '=':
-        return true;
-
-        default:
-        return false;
+        if(ch==oprtr.at(i))
+        {
+            counter++;
+        }
     }
-}
-
-bool isOperatorduplicate(char ch)
-{
-    switch (ch)
+    if(counter!=0)
     {
-        case '+':
         return true;
-
-        case '-':
-        return true;
-
-        case '|':
-        return true;
-
-        case '&':
-        return true;
-
-        case '=':
-        return true;
-
-        default:
+    }
+    else
+    {
         return false;
     }
 }
@@ -291,7 +268,76 @@ bool isKeyword(char *str)
             counter++;
         }
     }
-    if(counter>0)
+    if(counter!=0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool isboolOprtr(char *str)
+{
+    char carray[5];
+    strcpy(carray,str);
+    string temp= convertToString(carray,strlen(carray));
+    int counter=0;
+    for(int i=0;i<boolOprtr.size();i++)
+    {
+        if(temp==boolOprtr[i])
+        {
+            counter++;
+        }
+    }
+    if(counter!=0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool isSpcOprtr1(char *str)
+{
+    char carray[5];
+    strcpy(carray,str);
+    string temp= convertToString(carray,strlen(carray));
+    int counter=0;
+    for(int i=0;i<spcOprtr1.size();i++)
+    {
+        if(temp==spcOprtr1[i])
+        {
+            counter++;
+        }
+    }
+    if(counter!=0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool isSpcOprtr2(char *str)
+{
+    char carray[5];
+    strcpy(carray,str);
+    string temp= convertToString(carray,strlen(carray));
+    int counter=0;
+    for(int i=0;i<spcOprtr2.size();i++)
+    {
+        if(temp==spcOprtr2[i])
+        {
+            counter++;
+        }
+    }
+    if(counter!=0)
     {
         return true;
     }
@@ -319,10 +365,7 @@ bool isNumber(char* str)
             numOfDecimal++;
         }
      
-        if (str[i] != '0' && str[i] != '1' && str[i] != '2'
-            && str[i] != '3' && str[i] != '4' && str[i] != '5'
-            && str[i] != '6' && str[i] != '7' && str[i] != '8'
-            && str[i] != '9' || (str[i] == '-' && i > 0))
+        if (isDigit(str[i])==false || (str[i] == '-' && i > 0))
             {
                 return false;
             }
@@ -344,80 +387,13 @@ char* subString(char* realStr, int l, int r)
     return str;
 }
 
-void parse(char* str)
+void callFunc()
 {
-    int left = 0, right = 0;
-    int len = strlen(str);
-    while (right <= len && left <= right) {
-        if(str[right]=='\\' && str[right+1]=='n')
-        {
-            continue;
-        }
-        else
-        {
-        if (isPunc(str[right]) == false)
-            {
-                right++;
-            }
-
-        if (isPunc(str[right]) == true && left == right)
-            {
-            if (isOperator(str[right]) == true)
-            {
-                  char az=str[right];
-                  string a;
-                  a.push_back(az);
-                keep.push_back(make_pair("OPERATOR",a));
-            }
-            right++;
-            left = right;
-            } else if (isPunc(str[right]) == true && left != right
-                   || (right == len && left != right))
-            {
-            char* sub = subString(str, left, right - 1);
-            string str(sub);
-
-            if (isKeyword(sub) == true)
-                        {
-                              keep.push_back(make_pair("KEYWORD",str));
-                        }
-            else if (isNumber(sub) == true)
-                        {
-                            keep.push_back(make_pair("NUMBER",str));
-                        }
-            else if (validId(sub) == true
-                     && isPunc(str[right - 1]) == false)
-                     {
-                         keep.push_back(make_pair("Valid Identifier",str));
-                     }
-            else if (validId(sub) == false
-                     && isPunc(str[right - 1]) == false)
-                     {
-                         keep.push_back(make_pair("Non-Valid Identifier",str));
-                     }
-
-            left = right;
-            }
-    }
-    }
-    return;
-}
-
-int main()
-{
-    char input[5000];
-    int j=0;
-    freopen("spl_democode.txt","r",stdin);
-    scanf("%[^\0]s",&input);
-    string instring = convertToString(input, strlen(input));
-    string temp =commentDel(instring);
-    string string_wthoutCom =commentDelmulti(temp);
-    char c[string_wthoutCom.size()+1];
-    strcpy(c, string_wthoutCom.c_str());
-    parse(c);
-    for(int i=0;i<keep.size();i++)
-    {
-          cout<<keep[i].first<<": "<<keep[i].second<<endl;
-    }
-    return 0;
+    keywordList();
+    numList();
+    puncList();
+    opList();
+    boolOpList();
+    spcOpList1();
+    spcOpList2();
 }
