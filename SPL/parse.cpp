@@ -1,4 +1,7 @@
-#include"main.h"
+#include"header.h"
+
+vector<pair<string,string>> keep;
+
 void parse(char* str)
 {
     int left = 0, right = 0;

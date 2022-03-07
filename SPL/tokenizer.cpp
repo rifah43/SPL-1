@@ -1,4 +1,4 @@
-#include"main.h"
+#include"header.h"
 
 vector<string>keywords;
 vector<char>digit;
@@ -104,69 +104,6 @@ void spcOpList2()
 {
     spcOprtr2.push_back("in");
     spcOprtr2.push_back("not in");
-}
-
-string commentDel(string code)
-{
-    int n = code.length();
-    string temp;
- 
-    bool single = false;
- 
-    for (int i=0; i<n; i++)
-    {
-        if (single == true && code[i] == '\n')
-        {
-            single = false;
-        }
- 
-        else if (single)
-        {
-            continue;
-        }
- 
-        else if (code[i] == '#')
-        {
-            single = true, i++;
-        }
-        else 
-        {
-            temp += code[i];
-        }
-    }
-    return temp;
-}
-
-string commentDelmulti(string code)
-{
-    int n = code.length();
-    string temp;
-
-    bool multiple = false;
- 
-    for (int i=0; i<n-2; i++)
-    {
-        if (multiple == false && code[i] == '"' && code[i+1] == '"' && code[i+2] == '"')
-        {
-            multiple = true,  i=i+3;
-        }
-
-        else if (multiple == true && code[i] == '"' && code[i+1] == '"' && code[i+2] == '"')
-        {
-            multiple = false;
-        }
- 
-        else if (multiple)
-        {
-            continue;
-        }
- 
-        else 
-        {
-            temp += code[i];
-        }
-    }
-    return temp;
 }
 
 bool isPunc(char ch)
@@ -371,29 +308,4 @@ bool isNumber(char* str)
             }
     }
     return true;
-}
-
-char* subString(char* realStr, int l, int r)				
-{
-    int i;
-
-    char* str = (char*) malloc(sizeof(char) * (r - l + 2));
-
-    for (i = l; i <= r; i++)
-    {
-        str[i - l] = realStr[i];
-        str[r - l + 1] = '\0';
-    }
-    return str;
-}
-
-void callFunc()
-{
-    keywordList();
-    numList();
-    puncList();
-    opList();
-    boolOpList();
-    spcOpList1();
-    spcOpList2();
 }
