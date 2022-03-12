@@ -1,14 +1,93 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-vector<pair<string,string>> keep;
-vector<string>keywords;
-vector<char>digit;
-vector<char>punc;
-vector<char>oprtr;
-vector<string>boolOprtr;
-vector<string>spcOprtr1;
-vector<string>spcOprtr2;
+int Cnt=0,ln=1;
+
+struct keepData
+{
+    int line;
+    string expression;
+    string dataType;
+};
+
+vector<keepData>keep;
+
+string commentDel(string code)
+{
+    int n = code.length();
+    string temp;
+ 
+    bool single = false;
+ 
+    for (int i=0; i<n; i++)
+    {
+        if (single == true && code[i] == '\n')
+        {
+            single = false;
+        }
+ 
+        else if (single)
+        {
+            continue;
+        }
+ 
+        else if (code[i] == '#')
+        {
+            single = true, i++;
+        }
+        else 
+        {
+            temp += code[i];
+        }
+    }
+    return temp;
+}
+
+string commentDelmulti(string code)
+{
+    int n = code.length();
+    string temp;
+
+    bool multiple = false;
+ 
+    for (int i=0; i<n-2; i++)
+    {
+        if (multiple == false && code[i] == '"' && code[i+1] == '"' && code[i+2] == '"')
+        {
+            multiple = true,  i=i+3;
+        }
+
+        else if (multiple == true && code[i] == '"' && code[i+1] == '"' && code[i+2] == '"')
+        {
+            multiple = false;
+        }
+ 
+        else if (multiple)
+        {
+            continue;
+        }
+ 
+        else 
+        {
+            temp += code[i];
+        }
+    }
+    return temp;
+}
+
+char* subString(char* realStr, int l, int r)				
+{
+    int i;
+
+    char* str = (char*) malloc(sizeof(char) * (r - l + 2));
+
+    for (i = l; i <= r; i++)
+    {
+        str[i - l] = realStr[i];
+        str[r - l + 1] = '\0';
+    }
+    return str;
+}
 
 string convertToString(char* charArray, int size)
 {
@@ -20,19 +99,36 @@ string convertToString(char* charArray, int size)
     return convStr;
 }
 
+vector<string>keywords;
+vector<char>digit;
+vector<char>punc;
+vector<char>oprtr;
+vector<string>boolOprtr;
+vector<string>spcOprtr1;
+vector<string>spcOprtr2;
+
 void keywordList()
 {
-    keywords.push_back("if");
-    keywords.push_back("else");
-    keywords.push_back("while");
-    keywords.push_back("do");
-    keywords.push_back("break");
-    keywords.push_back("continue");
-    keywords.push_back("return");
-    keywords.push_back("input");
+    keywords.push_back("If");
     keywords.push_back("print");
-    keywords.push_back("True");
-    keywords.push_back("False");
+    keywords.push_back("For");
+    keywords.push_back("AsyncFor");
+    keywords.push_back("While");
+    keywords.push_back("With");
+    keywords.push_back("AsyncWith");
+    keywords.push_back("Raise");
+    keywords.push_back("Match");
+    keywords.push_back("Try");
+    keywords.push_back("Assert");
+    keywords.push_back("Import");
+    keywords.push_back("Global");
+    keywords.push_back("Nonlocal");
+    keywords.push_back("Pass");
+    keywords.push_back("Break");
+    keywords.push_back("Continue");
+    keywords.push_back("Return");
+    keywords.push_back("Delete");
+    keywords.push_back("Assign");
 }
 
 void numList()
@@ -106,69 +202,6 @@ void spcOpList2()
 {
     spcOprtr2.push_back("in");
     spcOprtr2.push_back("not in");
-}
-
-string commentDel(string code)
-{
-    int n = code.length();
-    string temp;
- 
-    bool single = false;
- 
-    for (int i=0; i<n; i++)
-    {
-        if (single == true && code[i] == '\n')
-        {
-            single = false;
-        }
- 
-        else if (single)
-        {
-            continue;
-        }
- 
-        else if (code[i] == '#')
-        {
-            single = true, i++;
-        }
-        else 
-        {
-            temp += code[i];
-        }
-    }
-    return temp;
-}
-
-string commentDelmulti(string code)
-{
-    int n = code.length();
-    string temp;
-
-    bool multiple = false;
- 
-    for (int i=0; i<n-2; i++)
-    {
-        if (multiple == false && code[i] == '"' && code[i+1] == '"' && code[i+2] == '"')
-        {
-            multiple = true,  i=i+3;
-        }
-
-        else if (multiple == true && code[i] == '"' && code[i+1] == '"' && code[i+2] == '"')
-        {
-            multiple = false;
-        }
- 
-        else if (multiple)
-        {
-            continue;
-        }
- 
-        else 
-        {
-            temp += code[i];
-        }
-    }
-    return temp;
 }
 
 bool isPunc(char ch)
@@ -356,15 +389,11 @@ bool isNumber(char* str)
     {
         return false;
     }
-    for (i = 0 ; i < len ; i++)
+    for (i = 0 ; i < len-2 ; i++)
     {
-        char temp= str[i];
-        if (numOfDecimal > 1 && str[i] == '.')
+        if (isDigit(str[i])==true && str[i+1] == '.' && isDigit(str[i+2])==true)
         {
-            return false;
-        } else if (numOfDecimal <= 1)
-        {
-            numOfDecimal++;
+            return true;
         }
      
         if (isDigit(str[i])==false || (str[i] == '-' && i > 0))
@@ -375,32 +404,33 @@ bool isNumber(char* str)
     return true;
 }
 
-char* subString(char* realStr, int l, int r)				
+void callFunc()
 {
-    int i;
-
-    char* str = (char*) malloc(sizeof(char) * (r - l + 2));
-
-    for (i = l; i <= r; i++)
-    {
-        str[i - l] = realStr[i];
-        str[r - l + 1] = '\0';
-    }
-    return str;
+    keywordList();
+    numList();
+    puncList();
+    opList();
+    boolOpList();
+    spcOpList1();
+    spcOpList2();
 }
 
 
-void parse(char* str)
+void tokens(char* str)
 {
     int left = 0, right = 0;
     int len = strlen(str);
     while (right <= len && left <= right)
     {
+        keep.push_back(keepData());
+        if(str[right]=='\n')
+        {
+            ln++;
+        }
         if (isPunc(str[right]) == false)
             {
                 right++;
             }
-
         if (isPunc(str[right]) == true && left == right)
             {
                 int cnt=0;
@@ -412,71 +442,92 @@ void parse(char* str)
                         string a;
                         a.push_back(str[right]);
                         a.push_back(str[right+1]);
-                        keep.push_back(make_pair("GtE",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="GtE";
                     }
                     else if(str[right]=='>' && str[right+1]=='=' )
                     {
                         string a;
                         a.push_back(str[right]);
                         a.push_back(str[right+1]);
-                        keep.push_back(make_pair("LtE",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="LtE";
                     }
                     else if(str[right]=='!' && str[right]=='=')
                     {
                         string a;
                         a.push_back(str[right]);
                         a.push_back(str[right+1]);
-                        keep.push_back(make_pair("NotEq",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="NotEq";
                     }
                     else if(str[right]=='=' && str[right]=='=')
                     {
                         string a;
                         a.push_back(str[right]);
                         a.push_back(str[right+1]);
-                        keep.push_back(make_pair("Eq",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="Eq";
                     }
                     else if(str[right]=='*' && str[right]=='*')
                     {
                         string a;
                         a.push_back(str[right]);
                         a.push_back(str[right+1]);
-                        keep.push_back(make_pair("Pow",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="Pow";
                     }
                     else if(str[right]=='/' && str[right]=='/')
                     {
                         string a;
                         a.push_back(str[right]);
                         a.push_back(str[right+1]);
-                        keep.push_back(make_pair("FloorDiv",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="FloorDiv";
                     }
                     else if(str[right]=='>' && str[right]=='>')
                     {
                         string a;
                         a.push_back(str[right]);
                         a.push_back(str[right+1]);
-                        keep.push_back(make_pair("RShift",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="RShift";
                     }
                     else if(str[right]=='<' && str[right]=='<')
                     {
                         string a;
                         a.push_back(str[right]);
                         a.push_back(str[right+1]);
-                        keep.push_back(make_pair("LShift",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="LShift";
                     }
                     else if(str[right]=='+' && (str[right]=='+' || str[right+1]=='='))
                     {
                         string a;
                         a.push_back(str[right]);
                         a.push_back(str[right+1]);
-                        keep.push_back(make_pair("INCREMENT OPERATOR",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="Incerement";
                     }
                     else if(str[right]=='-' && (str[right]=='-' || str[right+1]=='='))
                     {
                         string a;
                         a.push_back(str[right]);
                         a.push_back(str[right+1]);
-                        keep.push_back(make_pair("DECREMENT OPERATOR",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="Decrement";
                     }
+                    Cnt++;
                 }
                 if (isOperator(str[right]) == true && isOperator(str[right+1]) == false)
                 {
@@ -485,68 +536,97 @@ void parse(char* str)
                     {
                         string a;
                         a.push_back(str[right]);
-                        keep.push_back(make_pair("Gt",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="Gt";
                     }
                     else if(str[right]=='<')
                     {
                         string a;
                         a.push_back(str[right]);
-                        keep.push_back(make_pair("Lt",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="Lt";
                     }
                     else if(str[right]=='=')
                     {
                         string a;
                         a.push_back(str[right]);
-                        keep.push_back(make_pair("Assignment",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="Assignment";
                     }
                     else if(str[right]=='+')
                     {
                         string a;
                         a.push_back(str[right]);
-                        keep.push_back(make_pair("Add",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="Add";
                     }
                     else if(str[right]=='-')
                     {
                         string a;
                         a.push_back(str[right]);
-                        keep.push_back(make_pair("Sub",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="Sub";
                     }
                     else if(str[right]=='*')
                     {
                         string a;
                         a.push_back(str[right]);
-                        keep.push_back(make_pair("Mult",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="Mult";
                     }
                     else if(str[right]=='/')
                     {
                         string a;
                         a.push_back(str[right]);
-                        keep.push_back(make_pair("Div",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="Div";
                     }
                     else if(str[right]=='%')
                     {
                         string a;
                         a.push_back(str[right]);
-                        keep.push_back(make_pair("Mod",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="Mod";
                     }
                     else if(str[right]=='&')
                     {
                         string a;
                         a.push_back(str[right]);
-                        keep.push_back(make_pair("BitAnd",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="BitAnd";
                     }
                     else if(str[right]=='|')
                     {
                         string a;
                         a.push_back(str[right]);
-                        keep.push_back(make_pair("BitOr",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="BitOr";
                     }
                     else if(str[right]=='^')
                     {
                         string a;
                         a.push_back(str[right]);
-                        keep.push_back(make_pair("BitXor",a));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =a;
+                        keep[Cnt].dataType ="BitXor";
                     }
+                    else if(str[right]=='\t')
+                    {
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression ="->";
+                        keep[Cnt].dataType ="Indentation";
+                    }
+                    Cnt++;
                 }
                 if(cnt==2)
                 {
@@ -578,7 +658,9 @@ void parse(char* str)
                             left++;
                         }
                     }
-                    keep.push_back(make_pair("STRING_LITERAL",temp));
+                    keep[Cnt].line =ln;
+                    keep[Cnt].expression =temp;
+                    keep[Cnt].dataType ="String_Literal";
                 }
             
             else
@@ -587,77 +669,107 @@ void parse(char* str)
                 string st= convertToString(sub,strlen(sub));
                 if (isKeyword(sub) == true)
                 {
-                    keep.push_back(make_pair("KEYWORD",st));
+                    keep[Cnt].line =ln;
+                    keep[Cnt].expression =st;
+                    keep[Cnt].dataType ="Keyword";
                 }
                 else if (isNumber(sub) == true)
                 {
-                    keep.push_back(make_pair("NUMBER",st));
+                    int z=0;
+                    for(int i=0;i<strlen(sub);i++)
+                    {
+                        if(sub[i]=='.')
+                        {
+                            z++;
+                        }
+                    }
+                    if(z>0)
+                    {
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =st;
+                        keep[Cnt].dataType ="Double";
+                    }
+                    else
+                    {
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =st;
+                        keep[Cnt].dataType ="Integer";
+                    }
                 }
                 else if (isboolOprtr(sub) == true)
                 {
                     if(strcmp(sub,"and")==0)
                     {
-                        keep.push_back(make_pair("And",st));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =st;
+                        keep[Cnt].dataType ="And";
                     }
                     else if(strcmp(sub,"or")==0)
                     {
-                        keep.push_back(make_pair("Or",st));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =st;
+                        keep[Cnt].dataType ="Or";
                     }
                     else
                     {
-                        keep.push_back(make_pair("Not",st));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =st;
+                        keep[Cnt].dataType ="Not";
                     }
                 }
                 else if (isSpcOprtr1(sub) == true)
                 {
                     if(strcmp(sub,"is")==0)
                     {
-                        keep.push_back(make_pair("Is",st));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =st;
+                        keep[Cnt].dataType ="Is";
                     }
                     else
                     {
-                        keep.push_back(make_pair("IsNot",st));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =st;
+                        keep[Cnt].dataType ="IsNot";
                     }
                 }
                 else if (isSpcOprtr2(sub) == true)
                 {
                     if(strcmp(sub,"in")==0)
                     {
-                        keep.push_back(make_pair("In",st));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =st;
+                        keep[Cnt].dataType ="In";
                     }
                     else
                     {
-                        keep.push_back(make_pair("NotIn",st));
+                        keep[Cnt].line =ln;
+                        keep[Cnt].expression =st;
+                        keep[Cnt].dataType ="NotIn";
                     }
                 }
                 else if (validId(sub) == true
                 && isPunc(str[right - 1]) == false)
                 {
-                    keep.push_back(make_pair("Valid Identifier",st));
+                    keep[Cnt].line =ln;
+                    keep[Cnt].expression =st;
+                    keep[Cnt].dataType ="Valid Identifier";
                 }
                 else if (validId(sub) == false
                 && isPunc(str[right - 1]) == false)
                 {
-                    keep.push_back(make_pair("Non-Valid Identifier",st));
+                    keep[Cnt].line =ln;
+                    keep[Cnt].expression =st;
+                    keep[Cnt].dataType ="Non Valid Identifier";
                 }
             }
-
             left = right;
-            }
+            Cnt++;
+        }
+            
     }
     return;
 }
 
-void callFunc()
-{
-    keywordList();
-    numList();
-    puncList();
-    opList();
-    boolOpList();
-    spcOpList1();
-    spcOpList2();
-}
 int main()
 {
     cout<<"Enter the name of the file: "<<endl;
@@ -681,10 +793,19 @@ int main()
     string string_wthoutCom =commentDelmulti(temp);
     char c[string_wthoutCom.size()+1];
     strcpy(c, string_wthoutCom.c_str());
-    parse(c);
-    for(int i=0;i<keep.size();i++)
+    tokens(c);
+     ofstream out_file("tokens.txt");
+    
+	if (!out_file) {
+		cout << "File not created!";
+	}
+	else
     {
-          cout<<keep[i].first<<": "<<keep[i].second<<endl;
-    }
+        for(int i=0;i<Cnt;i++)
+        {
+            out_file<<keep[i].line<<"\t"<<keep[i].expression<<"\t\t"<<keep[i].dataType<<endl;
+        }
+		out_file.close();
+	}
     return 0;
 }
