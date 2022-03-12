@@ -1,0 +1,14 @@
+1	print		Keyword
+1	Hello world		String_Literal
+2	x_y12		Valid Identifier
+2	=		Assignment
+2	5.97		Double
+3	y		Integer
+3	=		Assignment
+3	7		Integer
+5	print		Keyword
+5	x		Integer
+5	+		Add
+5	y		Integer
+6	print		Keyword
+6	This is a democode written		String_Literal

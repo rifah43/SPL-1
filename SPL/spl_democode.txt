@@ -1,6 +1,6 @@
 #start
 print("Hello world")
-x_y12=5
+x_y12=5.97
 #2nd comment
 y=7
 """
