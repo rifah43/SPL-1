@@ -1,0 +1,16 @@
+1	0	print		Keyword
+1	0	Hello world		String_Literal
+2	0	x		Valid Identifier
+2	0	=		Operator
+2	0	2		Integer
+2	0	+		Operator
+2	0	5		Integer
+3	0	y		Valid Identifier
+3	0	=		Operator
+3	0	 10.54		Valid Identifier
+3	0	*		Operator
+3	0	12		Integer
+4	0	print		Keyword
+4	0	x		Valid Identifier
+4	0	+		Operator
+4	0	2		Integer
